@@ -9,13 +9,8 @@ jobs:
       runs-on: ubuntu-22.04
       steps:
       - uses: actions/checkout@v4
-<<<<<<< Updated upstream
       - name: make lib_prague
         run: make lib_prague 
-=======
-      - name: make libprague
-        run: make libprague 
->>>>>>> Stashed changes
       - name: make all
         run: make all
 
@@ -23,8 +18,8 @@ jobs:
       runs-on: windows-2022
       steps:
       - uses: actions/checkout@v4
-      - name: make libprague
-        run: make libprague 
+      - name: make lib_prague
+        run: make lib_prague 
       - name: make all
         run: make all
 
@@ -32,8 +27,8 @@ jobs:
       runs-on: macos-13
       steps:
       - uses: actions/checkout@v4
-      - name: make libprague
-        run: make libprague 
+      - name: make lib_prague
+        run: make lib_prague 
       - name: make all
         run: make all
 
@@ -41,7 +36,7 @@ jobs:
       runs-on: macos-14
       steps:
       - uses: actions/checkout@v4
-      - name: make libprague
-        run: make libprague 
+      - name: make lib_prague
+        run: make lib_prague 
       - name: make all
         run: make all
