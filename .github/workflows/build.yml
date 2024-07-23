@@ -42,7 +42,7 @@ jobs:
   #       run: make all
 
   build-freebsd-14_1:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: A job to run test in FreeBSD
     # env:
     #   MYTOKEN : ${{ secrets.MYTOKEN }}
@@ -55,8 +55,8 @@ jobs:
       with:
         # envs: 'MYTOKEN MYTOKEN2'
         usesh: true
-        # prepare: |
-        #   pkg install -y curl
+        prepare: |
+          pkg install -y g++ make
 
         # run: |
         #   pwd
