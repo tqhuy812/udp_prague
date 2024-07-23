@@ -9,7 +9,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v4
-      - name: make libprague
-        run: make libprague 
+      - name: make lib_prague
+        run: make lib_prague 
       - name: make all
         run: make all
