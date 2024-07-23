@@ -11,6 +11,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <netinet/ip.h>
+//#include <sys/socket.h>
+//#include <netinet/in.h>
+#include <arpa/inet.h>
 #endif
 
 #include "prague_cc.h"
@@ -88,34 +91,38 @@ ssize_t recvfrom_ecn_timeout(int sockfd, char *buf, size_t len, ecn_tp &ecn, tim
     return recvfrom(sockfd, buf, len, 0, src_addr, addrlen);
 #elif __linux__
     ssize_t r;
-    char ctrl_msg[len];
+    //SOCKADDR_IN *snd_addr = (SOCKADDR_IN *) &src_addr;
+    char ctrl_msg[CMSG_SPACE(sizeof(ecn))];
 
     struct msghdr rcv_msg;
     struct iovec rcv_iov[1];
     rcv_iov[0].iov_len = len;
     rcv_iov[0].iov_base = buf;
 
-    rcv_msg.msg_name = NULL;
-    rcv_msg.msg_namelen = 0;
+    rcv_msg.msg_name = (SOCKADDR_IN *) &src_addr;
+    rcv_msg.msg_namelen = *addrlen;
     rcv_msg.msg_iov = rcv_iov;
     rcv_msg.msg_iovlen = 1;
     rcv_msg.msg_control = ctrl_msg;
-    rcv_msg.msg_controllen = len;
+    rcv_msg.msg_controllen = sizeof(ctrl_msg);
 
-    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
-        perror("setsock timeout failed\n");
-        return -1;
-    }
+    //if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+    //    printf("setsock timeout failed\n");
+    //    return -1;
+    //}
     if ((r = recvmsg(sockfd, &rcv_msg, 0)) < 0)
     {
-        perror("Failt to recv UDP message from socket\n");
+        printf("Failt to recv UDP message from socket\n");
         return -1;
     }
     auto cmptr = CMSG_FIRSTHDR(&rcv_msg);
     assert(cmptr->cmsg_level == IPPROTO_IP && cmptr->cmsg_type == IP_TOS);
     ecn = (ecn_tp)((unsigned char)(*(uint32_t*)CMSG_DATA(cmptr)) & ECN_MASK);
 
+    SOCKADDR_IN *snd_addr = (SOCKADDR_IN *) &src_addr;
+    printf("From:\t %s:%d\n", inet_ntoa(snd_addr->sin_addr), ntohs(snd_addr->sin_port));
     return r;
+
 #endif
 }
 ssize_t sendto_ecn(SOCKET sockfd, char *buf, size_t len, ecn_tp ecn, const SOCKADDR *dest_addr, socklen_t addrlen)
@@ -217,6 +224,7 @@ int main(int argc, char **argv)
         socklen_t client_len = sizeof(client_addr);
         ecn_tp rcv_ecn;
         ssize_t bytes_received = recvfrom_ecn_timeout(sockfd, receivebuffer, sizeof(receivebuffer), rcv_ecn, 0, (SOCKADDR *)&client_addr, &client_len);
+        printf("From:\t %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
         while (bytes_received == -1) {   // repeat if timeout or interrupted
             if (errno != EWOULDBLOCK && errno != EAGAIN) {
@@ -225,7 +233,10 @@ int main(int argc, char **argv)
             }
             bytes_received = recvfrom_ecn_timeout(sockfd, receivebuffer, sizeof(receivebuffer), rcv_ecn, 0, (SOCKADDR *)&client_addr, &client_len);
         }
-        printf("UDP Prague receiver receiving ECN %d with packet size %ld bytes.\n", rcv_ecn, bytes_received);
+
+        //SOCKADDR_IN *snd_addr = (SOCKADDR_IN *) &client_addr;
+        //printf("From:\t %s:%d\n", inet_ntoa(snd_addr->sin_addr), ntohs(snd_addr->sin_port));
+        printf("UDP Prague receiving ECN %d with size %ld bytes from %s:%d.\n", rcv_ecn, bytes_received, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
         // Extract the data message
         data_msg.hton();  // swap byte order if needed
