@@ -5,14 +5,14 @@ on:
       branches: [ main ]
 
 jobs:
-  # build-ubuntu-22:
-  #     runs-on: ubuntu-22.04
-  #     steps:
-  #     - uses: actions/checkout@v4
-  #     - name: make lib_prague
-  #       run: make lib_prague 
-  #     - name: make all
-  #       run: make all
+  build-ubuntu-22:
+      runs-on: ubuntu-22.04
+      steps:
+      - uses: actions/checkout@v4
+      - name: make lib_prague
+        run: make lib_prague 
+      - name: make all
+        run: make all
 
   # build-windows-2022:
   #     runs-on: windows-2022
@@ -41,29 +41,21 @@ jobs:
   #     - name: make all
   #       run: make all
 
-  build-freebsd-14_1:
-    runs-on: ubuntu-22.04
-    name: A job to run test in FreeBSD
-    # env:
-    #   MYTOKEN : ${{ secrets.MYTOKEN }}
-    #   MYTOKEN2: "value2"
-    steps:
-    - uses: actions/checkout@v4
-    - name: make lib_prague in FreeBSD
-      id: test
-      uses: vmactions/freebsd-vm@v1
-      with:
-        # envs: 'MYTOKEN MYTOKEN2'
-        usesh: true
-        prepare: |
-          pkg install -y g++ make
+# not working, FreeBSD VM from https://github.com/vmactions/freebsd-vm
+  # build-freebsd-14_1:
+  #   runs-on: ubuntu-22.04
+  #   name: A job to run test in FreeBSD
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - name: make lib_prague in FreeBSD
+  #     id: test
+  #     uses: vmactions/freebsd-vm@v1
+  #     with:
+  #       # envs: 'MYTOKEN MYTOKEN2'
+  #       usesh: true
+  #       prepare: |
+  #         pkg install -y g++ make
 
-        # run: |
-        #   pwd
-        #   ls -lah
-        #   whoami
-        #   env
-        #   freebsd-version
 
-        run: make lib_prague
+  #       run: make lib_prague
         
