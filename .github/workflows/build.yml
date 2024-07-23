@@ -5,14 +5,14 @@ on:
       branches: [ main ]
 
 jobs:
-  build-ubuntu-22:
-      runs-on: ubuntu-22.04
-      steps:
-      - uses: actions/checkout@v4
-      - name: make lib_prague
-        run: make lib_prague 
-      - name: make all
-        run: make all
+  # build-ubuntu-22:
+  #     runs-on: ubuntu-22.04
+  #     steps:
+  #     - uses: actions/checkout@v4
+  #     - name: make lib_prague
+  #       run: make lib_prague 
+  #     - name: make all
+  #       run: make all
 
   # build-windows-2022:
   #     runs-on: windows-2022
@@ -49,18 +49,21 @@ jobs:
     #   MYTOKEN2: "value2"
     steps:
     - uses: actions/checkout@v4
-    - name: Test in FreeBSD
+    - name: make lib_prague in FreeBSD
       id: test
       uses: vmactions/freebsd-vm@v1
       with:
-        envs: 'MYTOKEN MYTOKEN2'
+        # envs: 'MYTOKEN MYTOKEN2'
         usesh: true
-        prepare: |
-          pkg install -y curl
+        # prepare: |
+        #   pkg install -y curl
 
-        run: |
-          pwd
-          ls -lah
-          whoami
-          env
-          freebsd-version
+        # run: |
+        #   pwd
+        #   ls -lah
+        #   whoami
+        #   env
+        #   freebsd-version
+
+        run: make lib_prague
+        
